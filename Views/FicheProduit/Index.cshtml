@@ -1,0 +1,21 @@
+﻿@model Produit
+
+@{
+    ViewData["Title"] = "fiche produit";
+}
+
+<h1>fiche produit</h1>
+
+
+<div>
+    <button class="btnCarouselle" id="prev">&#10096</button>
+    <button class="btnCarouselle" id="next">&#10097</button>
+    <ul>
+    @foreach (var image in Model.imagesProduits)
+    {
+        <li class="slide">
+            <img src="@image.url" alt="image carouselle" />
+        </li>
+    }
+    </ul>
+</div>

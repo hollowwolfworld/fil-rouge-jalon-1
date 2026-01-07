@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - e_commerce</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    @* <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> *@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/e_commerce.styles.css" asp-append-version="true" />
 </head>
@@ -18,7 +18,7 @@
     <nav id="menu">
         <ul id="elem_burger">
             <li id="burger">
-                <a href="#" class="text-primary">acceuil</a>
+                <a asp-area="" asp-controller="Acceuil" asp-action="Index">acceuil</a>
             </li>
             <li id="burger">
                 <a href="#" class="text-primary">conexion</a>
@@ -35,11 +35,6 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - e_commerce - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

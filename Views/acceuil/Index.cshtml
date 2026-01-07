@@ -22,7 +22,9 @@
 
             <p>@item.price</p>
             <p>@item.short_desc</p>
-            <button>lala</button>
+            <button>
+                <a asp-area="" asp-controller="FicheProduit" asp-action="Index" asp-route-id="@(item.product_id)">lala</a>
+            </button>
     </article>
          }
 
