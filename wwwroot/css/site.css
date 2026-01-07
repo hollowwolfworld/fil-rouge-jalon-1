@@ -1,0 +1,73 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+#logo {
+    align-items: start;
+    width: 100px;
+    height: 100px;
+    margin: 20px;
+}
+
+header{
+    border-bottom:solid;
+    display:grid;
+    grid-template-columns:20% 20% 20% 20% 20%;
+}
+
+#burger {
+    list-style: none;
+}
+
+#elem_burger {
+   flex-direction:column;
+   background-color:antiquewhite;
+   text-align: center;
+   
+}
+
+.text-primary{
+    color:black!important;
+    text-decoration: none;
+}
+
+#icons:before {
+    content: "\2630";
+    grid-column-start: 5;
+}
+
+.active #icons:before {
+    content: "\2715";
+    grid-column-start: 5;
+}
+
+#icons{
+    grid-column-start:5;
+}
+
+#menu{
+    display: none;
+}
+
+#menu.active{
+    display : block;
+}
