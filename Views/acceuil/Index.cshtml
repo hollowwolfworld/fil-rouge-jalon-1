@@ -1,18 +1,31 @@
-﻿@model Produit
+﻿@model List<Produit>
 
 @{
-    ViewData["Title"] = "Produit";
+    ViewData["Title"] = "page d'acceuil";
 }
 
-<div>
+<nav id="acceuil">
     <h1>acceuil</h1>
-</div>
 
 <article class="Card">
-    <header>
-       
-     @Model.images[0].url;
+    <div>
+       @foreach (var item in Model)
+        {
+            <p>@item.name</p>
 
-    </header>
+            @foreach (var images in item.imagesProduits)
+            {
+                <img id="imgCard" src="@images.url" />
+            }
 
+            <p>@item.price</p>
+            <p>@item.short_desc</p>
+            <button>lala</button>
+         }
+    </div>
 </article>
+
+</nav>
+
+
+

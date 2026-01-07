@@ -71,3 +71,14 @@ header{
 #menu.active{
     display : block;
 }
+
+.acceuil {
+    grid-auto-flow;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    grid-template-rows: 20% 20% 20% 20% 20%;
+}
+
+#imgCard {
+    width: 20%;
+    height: 20%;
+}
