@@ -4,13 +4,15 @@
     ViewData["Title"] = "page d'acceuil";
 }
 
-<nav id="acceuil">
-    <h1>acceuil</h1>
+<h1>acceuil</h1>
 
-<article class="Card">
-    <div>
+<nav id="acceuil">
+    
+
+
        @foreach (var item in Model)
         {
+    <article class="Card">
             <p>@item.name</p>
 
             @foreach (var images in item.imagesProduits)
@@ -21,9 +23,8 @@
             <p>@item.price</p>
             <p>@item.short_desc</p>
             <button>lala</button>
+    </article>
          }
-    </div>
-</article>
 
 </nav>
 

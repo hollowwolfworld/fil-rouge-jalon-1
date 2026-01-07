@@ -72,13 +72,23 @@ header{
     display : block;
 }
 
-.acceuil {
-    grid-auto-flow;
-    grid-template-columns: 20% 20% 20% 20% 20%;
-    grid-template-rows: 20% 20% 20% 20% 20%;
+#acceuil {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 #imgCard {
-    width: 20%;
-    height: 20%;
+    width: 50%;
+    height: 50%;
+}
+
+.Card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:center;
+    border-block-color: black;
+    width: 50%;
 }
