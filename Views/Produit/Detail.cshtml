@@ -1,0 +1,32 @@
+﻿@model Produit
+
+@{
+    ViewData["Title"] = "fiche produit";
+}
+
+<h1>fiche produit</h1>
+
+
+<div class="carouselle">
+    <ul class="clc">
+    @foreach (var image in Model.imagesProduits)
+    {
+    @if (image == Model.imagesProduits[0])
+            {
+                <li class="slide active">
+                    <img class="imgcarou" src="@image.url" alt="image carouselle" />
+                </li>
+            };
+            @if (image != Model.imagesProduits[0])
+            {
+                <li class="slide">
+                    <img class="imgcarou" src="@image.url" alt="image carouselle" />
+                </li>
+            }
+    }
+    </ul>
+    <div class="prevnext">
+    <button class="btnCarouselle" id="prev">&#10096</button>
+    <button class="btnCarouselle" id="next">&#10097</button>
+    </div>
+</div>

@@ -1,4 +1,13 @@
 
+
+/*css du header*/
+
+header{
+    border-bottom:solid;
+    display:grid;
+    grid-template-columns:20% 20% 20% 20% 20%;
+}
+
 #logo {
     align-items: start;
     width: 100px;
@@ -6,11 +15,7 @@
     margin: 20px;
 }
 
-header{
-    border-bottom:solid;
-    display:grid;
-    grid-template-columns:20% 20% 20% 20% 20%;
-}
+/*css du menu burger*/
 
 #burger {
     list-style: none;
@@ -23,10 +28,6 @@ header{
    
 }
 
-.text-primary{
-    color:black!important;
-    text-decoration: none;
-}
 
 #icons:before {
     content: "\2630";
@@ -50,12 +51,16 @@ header{
     display : block;
 }
 
+/*css de la page d'acceuil*/
+
 #acceuil {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
 }
+
+/*css des card*/
 
 #imgCard {
     width: 50%;
@@ -69,3 +74,49 @@ header{
     align-items:center;
     width: 50%;
 }
+
+
+/*css du carrouselle*/
+
+.carouselle {
+    display:block;
+    height:50vh;
+    width:100vw;
+    position:absolute;
+
+}
+}
+.clc {
+    list-style: none;
+}
+    .slide.active {
+        opacity: 1;
+        list-style: none;
+        position: absolute;
+    }
+.slide {
+    list-style: none;
+    position:absolute;
+    opacity:0;
+}
+
+
+.imgcarou {
+    display:block;
+    width: 100%;
+    height: 100%;
+    object-fit:cover;
+}
+.prevnext {
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+
+
+

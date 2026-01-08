@@ -21,6 +21,6 @@
 
         public DateTime created_at { get; set; }
 
-        public List<Image> imagesProduits { get; set; }
+        public List<Image> ?imagesProduits { get; set; }
     }
 }

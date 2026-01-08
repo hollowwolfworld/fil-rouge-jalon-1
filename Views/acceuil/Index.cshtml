@@ -15,15 +15,20 @@
     <article class="Card">
             <p>@item.name</p>
 
-            @foreach (var images in item.imagesProduits)
+            @if (item.imagesProduits.Count > 0)
             {
-                <img id="imgCard" src="@images.url" />
+                <img id="imgCard" src="@item.imagesProduits[0].url" />
             }
+            @if (item.imagesProduits.Count <= 0)
+            {
+                <img id="imgCard" src="~/img/sansImage.jpg" />
+            }
+            
 
             <p>@item.price</p>
             <p>@item.short_desc</p>
             <button>
-                <a asp-area="" asp-controller="FicheProduit" asp-action="Index" asp-route-id="@(item.product_id)">lala</a>
+                <a asp-area="" asp-controller="Produit" asp-action="Detail" asp-route-id="@(item.product_id)">fiche produit</a>
             </button>
     </article>
          }
