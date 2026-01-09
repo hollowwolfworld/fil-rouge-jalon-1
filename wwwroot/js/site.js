@@ -6,6 +6,7 @@ icons.addEventListener("click", () => {
     header.classList.toggle("active");
 })
 
+//carouselle d'img
 
 const buttons = document.querySelectorAll(".btnCarouselle");
 

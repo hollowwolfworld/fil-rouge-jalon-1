@@ -23,7 +23,6 @@ namespace e_commerce.Controllers
         }
 
         [HttpGet]
-
         //detail du produit qui prend en paramettre l'id d'un produit
         public IActionResult Detail(int id)
         {
