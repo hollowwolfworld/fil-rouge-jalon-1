@@ -73,19 +73,29 @@ header{
     justify-content: center;
     align-items:center;
     width: 50%;
+    border-style:solid;
 }
 
+
+/*css de la fiche produit */
+
+.fiche_prod {
+    display: flex;
+    flex-direction: column;
+    align-content: flex-start;
+    width: 100vw;
+    height: 100vh;
+}
 
 /*css du carrouselle*/
-
 .carouselle {
-    display:block;
-    height:50vh;
-    width:100vw;
-    position:absolute;
+    order: 1;
+    display: block;
+    height: 50%;
+    width: 100%;
+    position: relative;
+}
 
-}
-}
 .clc {
     list-style: none;
 }
@@ -103,7 +113,7 @@ header{
 
 .imgcarou {
     display:block;
-    width: 100%;
+    width: 90%;
     height: 100%;
     object-fit:cover;
 }
@@ -117,5 +127,9 @@ header{
     width: 90%;
 }
 
+/*css de la nav fiche prod*/
 
+#elem_FicheProd {
+    order: 2;
+}
 

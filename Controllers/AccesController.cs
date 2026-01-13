@@ -128,7 +128,7 @@ namespace e_commerce.Controllers
 
 
             // Requête pour compter le nombre d'utilisateurs avec l'email fourni
-            string query = "SELECT COUNT(*) FROM Utilisateurs WHERE email = @email";
+            string query = "SELECT COUNT(*) FROM users WHERE email = @email";
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
                 connexion.Open();
@@ -147,7 +147,7 @@ namespace e_commerce.Controllers
                     else
                     {
                         // Requête pour insérer un nouvel utilisateur
-                        string insertQuery = "INSERT INTO Utilisateurs (nom,prenom,email,mdp,emailverificationtoken) VALUES (@nom,@prenom,@email,@password,@token)";
+                        string insertQuery = "INSERT INTO users (name,firstname,email,password,emailverificationtoken) VALUES (@nom,@prenom,@email,@password,@token)";
                         // Génère un token de vérification d'email 
                         byte[] time = BitConverter.GetBytes(DateTime.UtcNow.ToBinary());// on ajoute la date aujourd'hui à l'adresse mail pour être sur que le token soit unique
                         byte[] key = Guid.NewGuid().ToByteArray();
@@ -265,6 +265,37 @@ namespace e_commerce.Controllers
 
             // Return the encrypted bytes from the memory stream.
             return encrypted;
+      
         }
+
+        public IActionResult ConfirmEmail([FromQuery] string email, [FromQuery] string token)
+        {
+            string query = "SELECT count(*) FROM usrers  WHERE email like @email AND emailverificationtoken like @token and emailverified is false";
+            int res;
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+                res = connexion.ExecuteScalar<int>(query, new { token = token, email = email });
+                if (res != 1)
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    string updateQuery = "UPDATE utilisateurs SET emailverified=true WHERE email like @email AND emailverificationtoken like @token AND emailverified is false";
+                    res = connexion.Execute(updateQuery, new { token = token, email = email });
+                    if (res == 1)
+                    {
+                        TempData[ValidateMessageKey] = "Votre adresse email a été confirmée avec succès. Vous pouvez maintenant vous connecter.";
+                        return RedirectToAction("Connexion");
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+            }
+
+        }
+
     }
 }

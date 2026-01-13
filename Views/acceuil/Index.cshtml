@@ -27,6 +27,12 @@
 
             <p>@item.price</p>
             <p>@item.short_desc</p>
+
+            @foreach (var categorie in item.categoriesProd)
+                {
+                    <p>@categorie.name</p>
+                }
+
             <button>
                 <a asp-area="" asp-controller="Produit" asp-action="Detail" asp-route-id="@(item.product_id)">fiche produit</a>
             </button>

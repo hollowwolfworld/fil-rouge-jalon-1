@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "fiche produit";
 }
+<main class="fiche_prod">
+
 
 <h1>fiche produit</h1>
 
@@ -30,3 +32,38 @@
     <button class="btnCarouselle" id="next">&#10097</button>
     </div>
 </div>
+
+    <nav id="elem_FicheProd">
+
+
+<article id="descFicheProd">
+
+    <p>@Model.description</p>
+
+</article>
+
+        <article id="sellerFicheProd">
+
+    <p>@Model.seller</p>
+
+</article>
+
+        <article id="priceFicheProd">
+
+    <p>@Model.price</p>
+
+</article>
+
+        <article id="quantityFicheProd">
+
+     <p>@Model.quantity</p>
+
+</article>
+
+        <button id="ajoutPanier">
+            <a asp-area="" asp-controller="Produit" asp-action="Detail">fiche produit</a>
+        </button>
+
+</nav>
+
+</main>

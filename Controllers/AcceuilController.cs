@@ -31,10 +31,14 @@ namespace e_commerce.Controllers
             //requetes sql pour recuperer tous les images de chaque produit
             string queryImages = "select * from image where product_id_fk = @product_id";
 
+            string queryCategories = "select * from categories c join products_categories pc on pc.category_id_fk = c.category_id where pc.product_id_fk = @product_id ";
+
             //creation de lists pour stoquer les resultat des query
             List<Produit> produits;
 
             List<Image> images;
+
+            List<Categorie> categories;
 
             //ouverture d'une connexion Npgsql 
             using (var connexion = new NpgsqlConnection(_connexionString))
@@ -52,18 +56,20 @@ namespace e_commerce.Controllers
 
                 produit.imagesProduits = images;
             }
-            
+
+            foreach (var produit in produits)
+            {
+                using (var connexion = new NpgsqlConnection(_connexionString))
+                {
+                    categories = connexion.Query<Categorie>(queryCategories,produit).ToList();
+                }
+
+                produit.categoriesProd = categories;
+            }
+
             //retour des d'une liste de produit
             return View(produits);
         }
-
-
-        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
-
 
     }
 }
