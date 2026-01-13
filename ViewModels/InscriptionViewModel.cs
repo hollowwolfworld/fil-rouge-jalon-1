@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using e_commerce.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace e_commerce.ViewModels
 {
@@ -23,6 +24,7 @@ namespace e_commerce.ViewModels
         [Compare("MotDePasse", ErrorMessage = "Les mots de passe ne correspondent pas.")]
         public string ConfirmMotDePasse { get; set; }
 
+        public Addresse? Adresse { get; set; }
 
     }
 }

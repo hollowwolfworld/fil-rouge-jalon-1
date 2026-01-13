@@ -1,0 +1,39 @@
+﻿@model ConnexionViewModel
+@{
+    ViewData["Title"] = "Connexion";
+}
+@if (ViewData.ContainsKey("ValidateMessage"))
+{
+    <p>@ViewData["ValidateMessage"]</p>
+}
+@if (TempData.ContainsKey("ValidateMessage"))
+{
+    <p>@TempData["ValidateMessage"]</p>
+}
+<h2>Connexion</h2>
+
+<form asp-action="Connexion" asp-controller="Acces" method="post">
+    <div class="form-group">
+        <label asp-for="@Model.Email"></label>
+        <input asp-for="@Model.Email" class="form-control" />
+        <span asp-validation-for="@Model.Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.Password"></label>
+        <input asp-for="@Model.Password" class="form-control" type="password" />
+        <span asp-validation-for="@Model.Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Se connecter</button>
+    </div>
+    @if (Context.Request.Query.ContainsKey("ReturnURL"))
+    {
+        <input type="hidden" name="ReturnURL" value="@Context.Request.Query["ReturnURL"]">
+    }
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -14,6 +14,8 @@
 <h2>Inscription</h2>
 
 <form asp-action="Inscription" asp-controller="Acces" method="post">
+   <div>
+
     <div class="form-group">
         <label asp-for="@Model.Nom"></label>
         <input asp-for="@Model.Nom" class="form-control" />
@@ -39,6 +41,34 @@
         <input asp-for="@Model.ConfirmMotDePasse" class="form-control" type="password" />
         <span asp-validation-for="@Model.ConfirmMotDePasse" class="text-danger"></span>
     </div>
+   </div>
+   <div>
+        <div class="form-group">
+            <label asp-for="@Model.Adresse!.Street_number"></label>
+            <input asp-for="@Model.Adresse!.Street_number" class="form-control" />
+            <span asp-validation-for="@Model.Adresse!.Street_number" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="@Model.Adresse!.Street_name"></label>
+            <input asp-for="@Model.Adresse!.Street_name" class="form-control" />
+            <span asp-validation-for="@Model.Adresse!.Street_name" class="form-control"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="@Model.Adresse!.City"></label>
+            <input asp-for="@Model.Adresse!.City" class="form-control" />
+            <span asp-validation-for="@Model.Adresse!.City" class="form-control"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="@Model.Adresse!.Postcode"></label>
+            <input asp-for="@Model.Adresse!.Postcode" class="form-control" />
+            <span asp-validation-for="@Model.Adresse!.Postcode" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="@Model.Adresse!.Country"></label>
+            <input asp-for="@Model.Adresse!.Country" class="form-control" />
+            <span asp-validation-for="@Model.Adresse!.Country" class="text-danger"></span>
+        </div>
+   </div>
     <button type="submit" class="btn btn-primary">S'inscrire</button>
 </form>
 

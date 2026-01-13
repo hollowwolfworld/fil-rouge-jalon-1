@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using e_commerce.Models;
+using e_commerce.ViewModels;
 using e_commerce.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -8,8 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Npgsql;
-using e_commerce.Models;
-using e_commerce.ViewModels;
+using System.Data;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
@@ -107,7 +108,7 @@ namespace e_commerce.Controllers
         [HttpGet]
         public IActionResult Inscription()
         {
-            var model = new InscriptionViewModel();
+            var model = new InscriptionViewModel();       
             return View(model);
         }
 
@@ -117,14 +118,13 @@ namespace e_commerce.Controllers
         /// <param name="utilisateur"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Inscription([FromForm] InscriptionViewModel utilisateur)
+        public IActionResult Inscription([FromForm] InscriptionViewModel viewModel)
         {
             // Vérifie si le modèle est valide
             if (!ModelState.IsValid)
             {
-                return View(utilisateur); // Retourne la vue avec le modèle en cas d'erreur
+                return View(viewModel); // Retourne la vue avec le modèle en cas d'erreur
             }
-
 
 
             // Requête pour compter le nombre d'utilisateurs avec l'email fourni
@@ -136,7 +136,7 @@ namespace e_commerce.Controllers
                 {
 
                     // Exécute la requête et récupère le nombre d'utilisateurs
-                    int nbUtilisateurs = connexion.QuerySingle<int>(query, new { email = utilisateur.Email });
+                    int nbUtilisateurs = connexion.QuerySingle<int>(query, new { email = viewModel.Email });
 
                     // Vérifie si l'email est déjà utilisé
                     if (nbUtilisateurs > 0)
@@ -146,8 +146,17 @@ namespace e_commerce.Controllers
                     }
                     else
                     {
+                        string queryaddresse = "insert into addresses (street_number,street_name,city,postcode,country) values (@Street_number,@Street_name,@City,@Postcode,@Country) returning addresse_id";
+
                         // Requête pour insérer un nouvel utilisateur
-                        string insertQuery = "INSERT INTO users (name,firstname,email,password,emailverificationtoken) VALUES (@nom,@prenom,@email,@password,@token)";
+                        string insertQuery = "INSERT INTO users (addresse_id_fk,name,firstname,email,password,emailverificationtoken) VALUES (@addresse_id,@nom,@prenom,@email,@password,@token)";
+
+                        int idAdresse; // recuprere l'id de l'adresse que l'on vient de créer
+
+
+                        idAdresse = connexion.ExecuteScalar<int>(queryaddresse, viewModel.Adresse);
+
+
                         // Génère un token de vérification d'email 
                         byte[] time = BitConverter.GetBytes(DateTime.UtcNow.ToBinary());// on ajoute la date aujourd'hui à l'adresse mail pour être sur que le token soit unique
                         byte[] key = Guid.NewGuid().ToByteArray();
@@ -162,10 +171,12 @@ namespace e_commerce.Controllers
                             encryptedToken = Convert.ToBase64String(EncryptStringToBytes_Aes(token, myAes.Key, myAes.IV)); // on recupere le token chiffre
                         }
                         // Hache le mot de passe de l'utilisateur
-                        string HashedPassword = PH.HashPassword(utilisateur.Email, utilisateur.MotDePasse); // on recup le mdp haché
+                        string HashedPassword = PH.HashPassword(viewModel.Email, viewModel.MotDePasse); // on recup le mdp haché
+
+
 
                         // Exécute la requête d'insertion et récupère le nombre de lignes affectées
-                        int RowsAffected = connexion.Execute(insertQuery, new { nom = utilisateur.Nom, prenom = utilisateur.Prenom, email = utilisateur.Email, password = HashedPassword, token = encryptedToken }, transaction: transaction);
+                        int RowsAffected = connexion.Execute(insertQuery, new { addresse_id = idAdresse, nom = viewModel.Nom, prenom = viewModel.Prenom, email = viewModel.Email, password = HashedPassword, token = encryptedToken }, transaction: transaction);
                         if (RowsAffected == 1)
                         {
                             // Création du lien de confirmation d'email
@@ -181,12 +192,12 @@ namespace e_commerce.Controllers
                             builder.Host = _ApplicationUrl;
                             builder.Port = _ApplicationPort;
                             builder.Path = $"/Acces/ConfirmEmail";
-                            builder.Query = $"email={Uri.EscapeDataString(utilisateur.Email)}&token={Uri.EscapeDataString(encryptedToken)}";
+                            builder.Query = $"email={Uri.EscapeDataString(viewModel.Email)}&token={Uri.EscapeDataString(encryptedToken)}";
 
                             // Envoi de l'email de confirmation
                             var mail = new MailMessage();
                             mail.From = new MailAddress(_SenderEmail);
-                            mail.To.Add(new MailAddress(utilisateur.Email));
+                            mail.To.Add(new MailAddress(viewModel.Email));
                             mail.Subject = "Confirmation de votre adresse email";
                             mail.Body = "<a href=\"" + builder.Uri.ToString() + "\">Confirmer votre email</a>";
                             mail.IsBodyHtml = true;
@@ -206,7 +217,7 @@ namespace e_commerce.Controllers
                                 {
                                     transaction.Rollback();
                                     ViewData[ValidateMessageKey] = "Erreur lors du processus d'inscription, veuillez réessayer.";
-                                    return View(utilisateur); // Retourne la vue avec l'erreur
+                                    return View(viewModel); // Retourne la vue avec l'erreur
                                 }
                             }
                             transaction.Commit();
@@ -270,7 +281,7 @@ namespace e_commerce.Controllers
 
         public IActionResult ConfirmEmail([FromQuery] string email, [FromQuery] string token)
         {
-            string query = "SELECT count(*) FROM usrers  WHERE email like @email AND emailverificationtoken like @token and emailverified is false";
+            string query = "SELECT count(*) FROM users  WHERE email like @email AND emailverificationtoken like @token and emailverified is false";
             int res;
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
@@ -281,7 +292,7 @@ namespace e_commerce.Controllers
                 }
                 else
                 {
-                    string updateQuery = "UPDATE utilisateurs SET emailverified=true WHERE email like @email AND emailverificationtoken like @token AND emailverified is false";
+                    string updateQuery = "UPDATE Users SET emailverified=true WHERE email like @email AND emailverificationtoken like @token AND emailverified is false";
                     res = connexion.Execute(updateQuery, new { token = token, email = email });
                     if (res == 1)
                     {
@@ -297,5 +308,109 @@ namespace e_commerce.Controllers
 
         }
 
-    }
+
+        [HttpGet]
+        public IActionResult connexion()
+        {
+            var model = new ConnexionViewModel();
+            return View(model);
+        }
+
+        /// <summary>
+        /// Traite le formulaire de connexion et authentifie l'utilisateur
+        /// </summary>
+        /// <param name="utilisateur">Les identifiants de connexion fournis par l'utilisateur</param>
+        /// <param name="ReturnUrl">URL de redirection après connexion réussie</param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> Connexion([FromForm] ConnexionViewModel utilisateur, [FromForm] string? ReturnUrl = null)
+        {
+            // Vérifie si le modèle est valide
+            if (!ModelState.IsValid)
+            {
+                ViewData[ValidateMessageKey] = "Email ou mot de passe invalide.";
+                return View();
+            }
+
+            // Requête pour récupérer l'utilisateur et son rôle
+            string query = "SELECT user_id,email,name, password FROM users WHERE email = @email";
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+                User utilisateurDB;
+                try
+                {
+                    // Exécute la requête et mappe les résultats aux objets Utilisateur et Role
+                    utilisateurDB = connexion.QuerySingle<User>(query, new { email = utilisateur.Email });
+                }
+                catch (InvalidOperationException)
+                {
+                    // Si l'utilisateur n'existe pas
+                    ViewData[ValidateMessageKey] = "Email ou mot de passe incorrect.";
+                    return View();
+                }
+
+                // Vérifie si le mot de passe correspond au hash stocké en base de données
+                if (PH.VerifyHashedPassword(utilisateur.Email, utilisateurDB.Password!, utilisateur.Password) == PasswordVerificationResult.Success)
+                {
+                    // Crée les claims (données) de l'utilisateur authentifié
+                    List<Claim> claims = new List<Claim>()
+                {
+                new Claim(ClaimTypes.Email, utilisateur.Email),
+                new Claim(ClaimTypes.NameIdentifier, utilisateurDB.Id.ToString()),
+                new Claim(ClaimTypes.Name, utilisateurDB.Name!),
+                
+                };
+                    if (utilisateurDB.Admin == true)
+                    {
+                        new Claim(ClaimTypes.Role, "Admin");
+                    }
+                    else
+                    {
+                        new Claim(ClaimTypes.Role, "User");
+                    }
+                        // Crée une identité à partir des claims
+                        ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    // Configure les propriétés de l'authentification
+                    AuthenticationProperties properties = new AuthenticationProperties()
+                    {
+                        AllowRefresh = true,
+                    };
+
+                    // Crée le cookie d'authentification et connecte l'utilisateur
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), properties);
+
+                    // Redirige vers l'URL de retour ou vers la page d'accueil
+                    if (!string.IsNullOrEmpty(ReturnUrl))
+                    {
+                        return Redirect(ReturnUrl);
+                    }
+                    return RedirectToAction("Index", "Acceuil");
+                }
+                else
+                {
+                    // Si le mot de passe est incorrect
+                    ViewData["ValidateMessage"] = "Email ou mot de passe incorrect.";
+                    return View();
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Déconnecte l'utilisateur
+        /// </summary>
+        /// <returns></returns>
+        [Authorize] // Restreint l'accès à cette action aux utilisateurs authentifiés uniquement
+        public async Task<IActionResult> Deconnexion()
+        {
+            // Supprime le cookie d'authentification et déconnecte l'utilisateur
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Redirige l'utilisateur vers la page de connexion
+            return RedirectToAction("Connexion", "Acces");
+        }
+
+    } 
+
 }

@@ -26,6 +26,24 @@
             <li id="burger">
                 <a href="#" class="text-primary">panier</a>
             </li>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Acces"
+                       asp-action="Deconnexion">Déconnexion</a>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Acces"
+                       asp-action="Inscription">Inscription</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Acces"
+                       asp-action="Connexion">Connexion</a>
+                </li>
+            }
         </ul>
     </nav>
 
