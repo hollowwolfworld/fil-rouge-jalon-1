@@ -108,7 +108,7 @@ namespace e_commerce.Controllers
         [HttpGet]
         public IActionResult Inscription()
         {
-            var model = new InscriptionViewModel();       
+            var model = new InscriptionViewModel();
             return View(model);
         }
 
@@ -276,7 +276,7 @@ namespace e_commerce.Controllers
 
             // Return the encrypted bytes from the memory stream.
             return encrypted;
-      
+
         }
 
         public IActionResult ConfirmEmail([FromQuery] string email, [FromQuery] string token)
@@ -333,7 +333,7 @@ namespace e_commerce.Controllers
             }
 
             // Requête pour récupérer l'utilisateur et son rôle
-            string query = "SELECT user_id,email,name, password FROM users WHERE email = @email";
+            string query = "SELECT user_id,email,name,admin,password,firstname FROM users WHERE email = @email";
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
                 User utilisateurDB;
@@ -354,22 +354,22 @@ namespace e_commerce.Controllers
                 {
                     // Crée les claims (données) de l'utilisateur authentifié
                     List<Claim> claims = new List<Claim>()
-                {
-                new Claim(ClaimTypes.Email, utilisateur.Email),
-                new Claim(ClaimTypes.NameIdentifier, utilisateurDB.Id.ToString()),
-                new Claim(ClaimTypes.Name, utilisateurDB.Name!),
-                
-                };
+                    {
+                        new Claim(ClaimTypes.Email, utilisateur.Email),
+                        new Claim(ClaimTypes.NameIdentifier, utilisateurDB.Id.ToString()),
+                        new Claim(ClaimTypes.Name, utilisateurDB.Name!),
+                    };
+                    
                     if (utilisateurDB.Admin == true)
                     {
-                        new Claim(ClaimTypes.Role, "Admin");
+                        claims.Add(new Claim(ClaimTypes.Role, "Admin"));
                     }
                     else
                     {
-                        new Claim(ClaimTypes.Role, "User");
+                        claims.Add(new Claim(ClaimTypes.Role, "User"));
                     }
-                        // Crée une identité à partir des claims
-                        ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    // Crée une identité à partir des claims
+                    ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
                     // Configure les propriétés de l'authentification
                     AuthenticationProperties properties = new AuthenticationProperties()
@@ -411,6 +411,6 @@ namespace e_commerce.Controllers
             return RedirectToAction("Connexion", "Acces");
         }
 
-    } 
+    }
 
 }

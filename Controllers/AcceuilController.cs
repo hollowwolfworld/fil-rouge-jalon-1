@@ -3,6 +3,8 @@ using e_commerce.Models;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Diagnostics;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace e_commerce.Controllers
 {
@@ -26,6 +28,10 @@ namespace e_commerce.Controllers
 
         public IActionResult Index()
         {
+
+            User.Claims.ToList().ForEach((item) => Console.WriteLine(item.Value));
+
+            string role = User.FindFirstValue(ClaimTypes.Role);
             //requetes sql pour recuperer tous les produits
             string queryProduits = "select * from products";
             //requetes sql pour recuperer tous les images de chaque produit

@@ -11,7 +11,24 @@
 <body>
     <header id="header">
         <img id="logo" src="/img/logo.png"/>
+       
+        @if(User.Identity.IsAuthenticated)
+        {
+         <div id="elemUser">
 
+            @if (User.IsInRole("Admin"))
+            {
+                <p>administrateur</p>
+                <p>@User.Identity.Name</p>
+            }
+            @if (User.IsInRole("User"))
+            {
+                <p>utilisateur</p>
+                <p>@User.Identity.Name</p>
+            }
+        </div>
+        }
+           
         <div id="icons"></div>
     </header>
 
@@ -20,14 +37,22 @@
             <li id="burger">
                 <a asp-area="" asp-controller="Acceuil" asp-action="Index">acceuil</a>
             </li>
-            <li id="burger">
-                <a asp-area="" asp-controller="Acces" asp-action="Inscription">inscription</a>
-            </li>
-            <li id="burger">
-                <a href="#" class="text-primary">panier</a>
-            </li>
             @if (User.Identity.IsAuthenticated)
             {
+                @if (User.IsInRole("User"))
+                {
+            <li id="burger">
+                        <a asp-area="" asp-controller="Panier" asp-action="Index">panier</a>
+            </li>     
+                }
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <li id="burger">
+                        <a href="#" class="text-primary">modifier produit</a>
+                    </li>
+                }
+
                 <li class="nav-item">
                     <a class="nav-link text-dark" asp-area="" asp-controller="Acces"
                        asp-action="Deconnexion">Déconnexion</a>
