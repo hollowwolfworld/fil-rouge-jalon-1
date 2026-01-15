@@ -1,8 +1,10 @@
 ﻿using Dapper;
 using e_commerce.Models;
+using e_commerce.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using System.Security.Claims;
 
 namespace e_commerce.Controllers
 {
@@ -25,79 +27,46 @@ namespace e_commerce.Controllers
         [Authorize]
         public IActionResult Index()
         {
-            int emailIndex = 0;
 
-            var email = User.Claims.ToList()[emailIndex].Value;
+            int id_user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            string queryIdUser = "select user_id from users where email = @email";
-
-            string queryCarts = "select * from carts where user_id_fk = @id_user ";
-
-            string queryCart_Product = "select * from carts_products where cart_id_fk = @cart";
-
-
-            string queryProduits = "select * from products where product_id = @Item.product_id_fk";
+            string queryProduits = "select p.* , cp.quantity  from products p join carts_products cp on p.product_id = cp.product_id_fk join carts c on cp.cart_id_fk = c.cart_id where c.user_id_fk = @id_user";
            
             //requetes sql pour recuperer tous les images de chaque produit
             string queryImages = "select * from image where product_id_fk = @product_id";
 
-            
-
-            int id_user;
-
-            List<CartProduct> cartProducts;
-
-            Cart cart;
-
-            List<Produit> produits;
-
-            List<Image> images;
-
-
-            using (var connexion = new NpgsqlConnection(_connexionString))
-            {
-               
-                id_user = connexion.ExecuteScalar<int>(queryIdUser,email);
-            }
-
-            using (var connexion = new NpgsqlConnection(_connexionString))
-            {
-               
-                cart = connexion.QuerySingle<Cart>(queryCarts, id_user);
-            }
-
+            Cart cart = new Cart();
 
 
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
 
-                cartProducts = connexion.Query<CartProduct>(queryCart_Product, cart).ToList();
-            }
-
-
-            foreach (var item in cartProducts)
-            {
-                using (var connexion = new NpgsqlConnection(_connexionString))
+                cart.Produits = connexion.Query<Produit, int, KeyValuePair<Produit, int>>(queryProduits, (produit, qte) =>
                 {
+                    return new KeyValuePair<Produit, int>(produit, qte);
+                }, new { id_user = id_user }, splitOn: "quantity").ToDictionary<Produit,int>();
 
-                    produits = connexion.Query<Produit>(queryProduits, item.product_id_fk).ToList();
-                }
-                foreach (var produit in produits)
+
+
+                foreach (var product in cart.Produits)
                 {
-                    using (var connexion = new NpgsqlConnection(_connexionString))
-                    {
-                        images = connexion.Query<Image>(queryImages, produit).ToList();
-                    }
-
-                    produit.imagesProduits = images;
+                    
+                     List<Image> images = connexion.Query<Image>(queryImages, product.Key).ToList();   
+                    
+                    product.Key.imagesProduits = images;
+                
+     
                 }
             }
 
+            PanierViewModel panierUser =  new PanierViewModel();
 
-            
-           
+            panierUser.cart = cart;
 
-            return View();
+
+
+
+            return View(panierUser);
         }
 
         [HttpPost]

@@ -2,8 +2,10 @@
 {
     public class Cart
     {
-        public int CartId { get; set; }
+        //public int CartId { get; set; }
 
-        public int Cart_user_id { get; set; }
+        //public User user { get; set; }
+
+        public Dictionary<Produit, int> Produits { get; set; }  = new Dictionary<Produit, int>();
     }
 }

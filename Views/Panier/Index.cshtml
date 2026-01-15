@@ -10,4 +10,25 @@
 <h1>panier</h1>
 
 
+    @foreach (var item in Model.cart.Produits)
+    {
+        <article class="Card_panier">
+            <p>@item.Key.name</p>
+
+            @if (item.Key.imagesProduits.Count > 0)
+            {
+                <img id="imgCard" src="@item.Key.imagesProduits[0].url" />
+            }
+            @if (item.Key.imagesProduits.Count <= 0)
+            {
+                <img id="imgCard" src="~/img/sansImage.jpg" />
+            }
+
+
+            <p>@item.Key.price</p>
+            <p>@item.Key.short_desc</p>
+            <p>@item.Value</p>
+        </article>
+    }
+
 </main>

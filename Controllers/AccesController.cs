@@ -310,7 +310,7 @@ namespace e_commerce.Controllers
 
 
         [HttpGet]
-        public IActionResult connexion()
+        public IActionResult Connexion()
         {
             var model = new ConnexionViewModel();
             return View(model);
@@ -333,7 +333,7 @@ namespace e_commerce.Controllers
             }
 
             // Requête pour récupérer l'utilisateur et son rôle
-            string query = "SELECT user_id,email,name,admin,password,firstname FROM users WHERE email = @email";
+            string query = "SELECT user_id as id,email,name,admin,password,firstname FROM users WHERE email = @email";
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
                 User utilisateurDB;

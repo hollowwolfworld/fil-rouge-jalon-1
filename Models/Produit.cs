@@ -2,6 +2,8 @@
 {
     public class Produit
     {
+        
+
         public int product_id { get; set; }
         
         public string name { get; set; }

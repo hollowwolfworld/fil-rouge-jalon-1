@@ -19,13 +19,12 @@
             @if (User.IsInRole("Admin"))
             {
                 <p>administrateur</p>
-                <p>@User.Identity.Name</p>
             }
-            @if (User.IsInRole("User"))
+            else if (User.IsInRole("User"))
             {
                 <p>utilisateur</p>
-                <p>@User.Identity.Name</p>
             }
+            <p>@User.Identity.Name</p>
         </div>
         }
            

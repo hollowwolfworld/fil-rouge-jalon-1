@@ -1,4 +1,6 @@
-﻿namespace e_commerce.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace e_commerce.Models
 {
     public class User
     {
