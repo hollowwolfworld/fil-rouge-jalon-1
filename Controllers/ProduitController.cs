@@ -1,7 +1,9 @@
-﻿using e_commerce.Models;
+﻿using Dapper;
+using e_commerce.Models;
+using e_commerce.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Npgsql;
-using Dapper;
 
 namespace e_commerce.Controllers
 {
@@ -53,6 +55,42 @@ namespace e_commerce.Controllers
 
             // retourne un produit.
             return View(produit);
+        }
+
+        [HttpGet]
+        public IActionResult CreeProd()
+        {
+            var model = new EditionViewModel();
+            
+            string queryCat = "select * from categories";
+
+            List<Categorie> categories;
+
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+                categories = connexion.Query<Categorie>(queryCat).ToList();
+            }
+
+            foreach (var category in categories)
+            {
+                model.Categories.Add(new SelectListItem(category.name, category.category_id.ToString()));
+            }
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public IActionResult CreeProd([FromForm] EditionViewModel newprod)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(newprod); // Retourne la vue avec le modèle en cas d'erreur
+            }
+
+
+
+            return View(newprod);
         }
     }
 }
