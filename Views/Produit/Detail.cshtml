@@ -62,7 +62,7 @@
         @if (User.Identity.IsAuthenticated)
         {
             <button id="ajoutPanier">
-                <a asp-area="" asp-controller="Panier" asp-action="Detail">ajouter au panier</a>
+                <a asp-area="" asp-controller="Panier" asp-action="AddProduct" asp-route-id="@(Model.product_id)">ajouter au panier</a>
             </button>
 
         }
