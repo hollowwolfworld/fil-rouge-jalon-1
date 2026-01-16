@@ -28,6 +28,9 @@
             <p>@item.Key.price</p>
             <p>@item.Key.short_desc</p>
             <p>@item.Value</p>
+            <button>
+                <a asp-area="" asp-controller="Panier" asp-action="DeletteProduct" asp-route-id="@(item.Key.product_id)">retirer du panier</a>
+            </button>
         </article>
     }
 

@@ -85,11 +85,11 @@ namespace e_commerce.Controllers
 
             string queryIdCart = "select cart_id from carts where user_id_fk = @id_user";
 
-            string queryCheckExist = "select quantity from carts_products where product_id_fk = @id and cart_id_fk = @id_cart";
+            string queryCheckQuantity = "select quantity from carts_products where product_id_fk = @id and cart_id_fk = @id_cart";
 
             string queryinCartProd = "insert into carts_products (product_id_fk,cart_id_fk,quantity) values (@id,@id_cart,@quantity_product)";
 
-            string queryupCartProd = "update carts_products set quantity = @quantity_product where product_id_fk = @id and cart_id_fk = @id_cart";
+            string queryUpCartProd = "update carts_products set quantity = @quantity_product where product_id_fk = @id and cart_id_fk = @id_cart";
 
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
@@ -111,7 +111,7 @@ namespace e_commerce.Controllers
 
                         id_cart = connexion.ExecuteScalar<int>(queryIdCart, new { id_user = id_user });
 
-                        quantity_product = connexion.ExecuteScalar<int>(queryCheckExist, new { id = id, id_cart = id_cart });
+                        quantity_product = connexion.ExecuteScalar<int>(queryCheckQuantity, new { id = id, id_cart = id_cart });
 
                         if (quantity_product == 0)
                         {
@@ -128,7 +128,7 @@ namespace e_commerce.Controllers
                         {
                             quantity_product = quantity_product + 1;
 
-                            int res = connexion.Execute(queryupCartProd, new { quantity_product = quantity_product, id = id, id_cart = id_cart });
+                            int res = connexion.Execute(queryUpCartProd, new { quantity_product = quantity_product, id = id, id_cart = id_cart });
                             if (res != 1)
                             {
                                 throw new InvalidOperationException();
@@ -143,6 +143,68 @@ namespace e_commerce.Controllers
                         throw new InvalidOperationException("echec de l'ajout au panier");
                     }
                 }
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult DeletteProduct(int id)
+        {
+            int id_user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            int quantity_product;
+
+            int id_cart;
+
+            string queryIdCart = "select cart_id from carts where user_id_fk = @id_user";
+
+            string queryCheckQuantity = "select quantity from carts_products where product_id_fk = @id and cart_id_fk = @id_cart";
+
+            string queryDeleteProd = "delete from carts_products where product_id_fk = @id and cart_id_fk = @id_cart";
+
+            string queryUpCartProd = "update carts_products set quantity = @quantity_product where product_id_fk = @id and cart_id_fk = @id_cart";
+
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+                connexion.Open();
+                using (var tran = connexion.BeginTransaction())
+
+                    try
+                    {
+
+
+                        id_cart = connexion.ExecuteScalar<int>(queryIdCart, new { id_user = id_user });
+
+                        quantity_product = connexion.ExecuteScalar<int>(queryCheckQuantity, new { id = id, id_cart = id_cart });
+
+                        if (quantity_product == 1)
+                        {
+                            int res = connexion.Execute(queryDeleteProd, new { id = id, id_cart = id_cart });
+                            if (res != 1)
+                            {
+                                throw new InvalidOperationException();
+                            }
+                        }
+
+                        else
+                        {
+                            quantity_product = quantity_product - 1;
+
+                            int res = connexion.Execute(queryUpCartProd, new { quantity_product = quantity_product, id = id, id_cart = id_cart });
+                            if (res != 1)
+                            {
+                                throw new InvalidOperationException();
+                            }
+                        }
+
+                        tran.Commit();
+                    }
+                    catch (Exception)
+                    {
+
+                        tran.Rollback();
+                        throw new InvalidOperationException("echec du retrait panier");
+                    }
             }
 
             return RedirectToAction("Index");
