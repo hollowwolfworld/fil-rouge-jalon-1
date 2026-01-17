@@ -1,9 +1,12 @@
 ﻿@model EditionViewModel
 
+@{
+    ViewData["Title"] = "page creation";
+}
 
 <h1>edition</h1>
 
-<form asp-controller="Produit" asp-action="CreeProd" method="post">
+<form asp-controller="Produit" asp-action="Creation" method="post">
 
     <table>
 
@@ -28,11 +31,6 @@
             <td><span asp-validation-for="@Model.Produit.description" class="text-danger"></span></td>
         </tr>
         <tr>
-            <td><label asp-for="@Model.Produit.name"></label></td>
-            <td><input asp-for="@Model.Produit.name"></td>
-            <td><span asp-validation-for="@Model.Produit.name" class="text-danger"></span></td>
-        </tr>
-        <tr>
             <td><label asp-for="@Model.Produit.discount"></label></td>
             <td><input asp-for="@Model.Produit.discount"></td>
             <td><span asp-validation-for="@Model.Produit.discount" class="text-danger"></span></td>
@@ -48,15 +46,16 @@
             <td><span asp-validation-for="@Model.Produit.quantity" class="text-danger"></span></td>
         </tr>
         <tr>
-            <select asp-for="@Model.Produit.categoriesProd" asp-items="Model.Categories"></select>
+            <td><label asp-for="@Model.categorieID"></label></td>
+            <td><select asp-for="@Model.categorieID" asp-items="@Model.Categories"></select></td>
         </tr>
     </table>
 
-
-
-
-
-
-
-
+    <input type="submit" value="Envoyer">
 </form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

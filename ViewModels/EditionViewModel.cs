@@ -7,7 +7,9 @@ namespace e_commerce.ViewModels
     {
        public  Produit Produit { get; set; }
 
-       public  List<SelectListItem> Categories { get; set; }
+        public List<SelectListItem> Categories { get; set; } = new List<SelectListItem>();
+
+        public int categorieID {  get; set; }
 
 
     }

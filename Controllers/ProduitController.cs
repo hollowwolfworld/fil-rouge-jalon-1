@@ -4,6 +4,8 @@ using e_commerce.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Npgsql;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace e_commerce.Controllers
 {
@@ -22,6 +24,27 @@ namespace e_commerce.Controllers
             {
                 throw new Exception("Error : Connexion string not found ! ");
             }
+        }
+
+        private List<SelectListItem> GetCategories()
+        {
+            List<SelectListItem> cat = new List<SelectListItem>();
+
+            string queryCat = "select * from categories";
+
+            List<Categorie> categories = new List<Categorie>();
+
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+                categories = connexion.Query<Categorie>(queryCat).ToList();
+            }
+
+            foreach (var item in categories)
+            {
+                cat.Add(new SelectListItem(item.name,item.category_id.ToString()));
+            }
+          
+            return cat;
         }
 
         [HttpGet]
@@ -58,39 +81,68 @@ namespace e_commerce.Controllers
         }
 
         [HttpGet]
-        public IActionResult CreeProd()
+        public IActionResult Creation()
         {
             var model = new EditionViewModel();
-            
-            string queryCat = "select * from categories";
+            model.Categories = GetCategories();
 
-            List<Categorie> categories;
-
-            using (var connexion = new NpgsqlConnection(_connexionString))
-            {
-                categories = connexion.Query<Categorie>(queryCat).ToList();
-            }
-
-            foreach (var category in categories)
-            {
-                model.Categories.Add(new SelectListItem(category.name, category.category_id.ToString()));
-            }
-
+           
             return View(model);
         }
 
 
         [HttpPost]
-        public IActionResult CreeProd([FromForm] EditionViewModel newprod)
+        public IActionResult Creation([FromForm] EditionViewModel newprod)
         {
             if (!ModelState.IsValid)
             {
                 return View(newprod); // Retourne la vue avec le modèle en cas d'erreur
             }
 
+            Console.WriteLine(newprod.Produit.categoriesProd.ToString());
 
 
-            return View(newprod);
+            string queryAddProd = "insert into product (name,seller,short_desc,description,discount,price,quantity) values (@newprod.Produit.name,@newprod.Produit.seller,@newprod.Produit.short_desc,@newprod.Produit.description,@newprod.Produit.discount,@newprod.Produit.price,newprod.Produit.quantity)";
+
+            string queryAddCatProd = "insert into products_categories (product_id_fk,category_id_fk) values (@newprod.Produit.product_id,@newprod.categorieID)";
+
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+                connexion.Open();
+                using (var tran = connexion.BeginTransaction())
+                {
+                    try
+                    {
+                        int res = connexion.ExecuteScalar<int>(queryAddProd, newprod);
+                        if (res != 1)
+                        {
+                            throw new InvalidOperationException();
+                        }
+                        foreach (var item in newprod.Produit.categoriesProd)   
+                        {
+                            int res2 = connexion.ExecuteScalar<int>(queryAddCatProd, newprod);
+                            if (res2 != 1)
+                            {
+                                throw new InvalidOperationException();
+                            }
+                        }
+
+                    }
+
+
+                    catch (Exception)
+                    {
+                        tran.Rollback();
+                        throw new InvalidOperationException("echec de l'ajout du produit");
+                    }
+
+                    tran.Commit();
+                }
+            }
+
+
+
+            return RedirectToRoute("Acceuil/Index");
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace e_commerce.Models
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace e_commerce.Models
 {
     public class Produit
     {
@@ -25,6 +27,6 @@
 
         public List<Image> ?imagesProduits { get; set; }
 
-        public List<Categorie> categoriesProd { get; set; }
+        public List<Categorie> ?categoriesProd { get; set; }
     }
 }
