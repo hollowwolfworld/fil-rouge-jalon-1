@@ -99,12 +99,11 @@ namespace e_commerce.Controllers
                 return View(newprod); // Retourne la vue avec le modèle en cas d'erreur
             }
 
-            Console.WriteLine(newprod.Produit.categoriesProd.ToString());
 
+    
+            string queryAddProd = "insert into products (name,seller,short_desc,description,discount,price,quantity) values (@name,@seller,@short_desc,@description,@discount,@price,@quantity) returning product_id";
 
-            string queryAddProd = "insert into product (name,seller,short_desc,description,discount,price,quantity) values (@newprod.Produit.name,@newprod.Produit.seller,@newprod.Produit.short_desc,@newprod.Produit.description,@newprod.Produit.discount,@newprod.Produit.price,newprod.Produit.quantity)";
-
-            string queryAddCatProd = "insert into products_categories (product_id_fk,category_id_fk) values (@newprod.Produit.product_id,@newprod.categorieID)";
+            string queryAddCatProd = "insert into products_categories (product_id_fk,category_id_fk) values (@product_id,@categorieID)";
 
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
@@ -113,19 +112,18 @@ namespace e_commerce.Controllers
                 {
                     try
                     {
-                        int res = connexion.ExecuteScalar<int>(queryAddProd, newprod);
+                        int productId = connexion.ExecuteScalar<int>(queryAddProd,new {name = newprod.Produit.name, seller = newprod.Produit.seller, short_desc = newprod.Produit.short_desc, description = newprod.Produit.description, discount = newprod.Produit.discount,price = newprod.Produit.price, quantity = newprod.Produit.quantity});
+
+
+
+                        
+                        int res = connexion.Execute(queryAddCatProd, new { product_id = productId, categorieID = newprod.categorieID});
                         if (res != 1)
                         {
                             throw new InvalidOperationException();
                         }
-                        foreach (var item in newprod.Produit.categoriesProd)   
-                        {
-                            int res2 = connexion.ExecuteScalar<int>(queryAddCatProd, newprod);
-                            if (res2 != 1)
-                            {
-                                throw new InvalidOperationException();
-                            }
-                        }
+                        
+                    tran.Commit();
 
                     }
 
@@ -136,7 +134,6 @@ namespace e_commerce.Controllers
                         throw new InvalidOperationException("echec de l'ajout du produit");
                     }
 
-                    tran.Commit();
                 }
             }
 
