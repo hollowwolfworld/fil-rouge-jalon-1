@@ -11,6 +11,8 @@ namespace e_commerce.ViewModels
 
         public int categorieID {  get; set; }
 
+        public IFormFile? ImageProd {  get; set; }
 
+        public string? imgBdd { get; set; }
     }
 }

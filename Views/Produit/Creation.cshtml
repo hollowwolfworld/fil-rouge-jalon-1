@@ -6,7 +6,7 @@
 
 <h1>edition</h1>
 
-<form asp-controller="Produit" asp-action="Creation" method="post">
+<form asp-controller="Produit" asp-action="Creation" method="post" enctype="multipart/form-data">
 
     <table>
 
@@ -48,6 +48,11 @@
         <tr>
             <td><label asp-for="@Model.categorieID"></label></td>
             <td><select asp-for="@Model.categorieID" asp-items="@Model.Categories"></select></td>
+        </tr>
+        <tr>
+            <td><label asp-for="@Model.ImageProd"></label></td>
+            <td><input type="file" asp-for="@Model.ImageProd"></td>
+            <td><span asp-validation-for="@Model.ImageProd" class="text-danger"></span></td>
         </tr>
     </table>
 

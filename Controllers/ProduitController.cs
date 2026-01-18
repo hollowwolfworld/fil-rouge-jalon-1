@@ -100,10 +100,38 @@ namespace e_commerce.Controllers
             }
 
 
-    
+            if (newprod.ImageProd != null)
+            {
+                var ext = Path.GetExtension(newprod.ImageProd.FileName).ToLowerInvariant();
+
+                if (string.IsNullOrEmpty(ext))
+                {
+                    ModelState.AddModelError("ImageProd", "image non accepter");
+                }
+            }
+
+
+
             string queryAddProd = "insert into products (name,seller,short_desc,description,discount,price,quantity) values (@name,@seller,@short_desc,@description,@discount,@price,@quantity) returning product_id";
 
             string queryAddCatProd = "insert into products_categories (product_id_fk,category_id_fk) values (@product_id,@categorieID)";
+
+            string queryAddImg = "insert into image (product_id_fk,url) values (@product_id,@imgBdd)";
+
+
+            string? filepath = null;
+            if (newprod.ImageProd != null && newprod.ImageProd.Length > 0)
+            {
+                filepath = Path.Combine("img/imgsProds/",Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + Path.GetExtension(newprod.ImageProd.FileName)).ToString();
+
+                using (var stream = System.IO.File.Create("wwwroot/" + filepath))
+                {
+                    newprod.ImageProd.CopyTo(stream);
+                }
+
+                newprod.imgBdd = filepath;
+            }
+
 
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
@@ -122,8 +150,15 @@ namespace e_commerce.Controllers
                         {
                             throw new InvalidOperationException();
                         }
-                        
-                    tran.Commit();
+
+                        int res2 = connexion.Execute(queryAddImg, new { product_id = productId,imgBdd = newprod.imgBdd });
+                        if (res2 != 1)
+                        {
+                            throw new InvalidOperationException();
+                        }
+
+
+                        tran.Commit();
 
                     }
 
@@ -139,7 +174,7 @@ namespace e_commerce.Controllers
 
 
 
-            return RedirectToRoute("Acceuil/Index");
+            return RedirectToAction("Creation");
         }
     }
 }
