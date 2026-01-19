@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using e_commerce.Models;
 using e_commerce.ViewModels;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Npgsql;
@@ -46,6 +47,7 @@ namespace e_commerce.Controllers
           
             return cat;
         }
+
 
         [HttpGet]
         //detail du produit qui prend en paramettre l'id d'un produit
@@ -99,17 +101,18 @@ namespace e_commerce.Controllers
                 return View(newprod); // Retourne la vue avec le modèle en cas d'erreur
             }
 
-
-            if (newprod.ImageProd != null)
+            foreach (var img in newprod.ImageProd)
             {
-                var ext = Path.GetExtension(newprod.ImageProd.FileName).ToLowerInvariant();
-
-                if (string.IsNullOrEmpty(ext))
+                if (img != null)
                 {
-                    ModelState.AddModelError("ImageProd", "image non accepter");
+                    var ext = Path.GetExtension(img.FileName).ToLowerInvariant();
+
+                    if (string.IsNullOrEmpty(ext))
+                    {
+                        ModelState.AddModelError("ImageProd", "image non accepter");
+                    }
                 }
             }
-
 
 
             string queryAddProd = "insert into products (name,seller,short_desc,description,discount,price,quantity) values (@name,@seller,@short_desc,@description,@discount,@price,@quantity) returning product_id";
@@ -118,20 +121,21 @@ namespace e_commerce.Controllers
 
             string queryAddImg = "insert into image (product_id_fk,url) values (@product_id,@imgBdd)";
 
-
-            string? filepath = null;
-            if (newprod.ImageProd != null && newprod.ImageProd.Length > 0)
+            foreach (var img in newprod.ImageProd)
             {
-                filepath = Path.Combine("img/imgsProds/",Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + Path.GetExtension(newprod.ImageProd.FileName)).ToString();
-
-                using (var stream = System.IO.File.Create("wwwroot/" + filepath))
+                string? filepath = null;
+                if (img != null && img.Length > 0)
                 {
-                    newprod.ImageProd.CopyTo(stream);
+                    filepath = Path.Combine("/img/imgsProds/", Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + Path.GetExtension(img.FileName)).ToString();
+
+                    using (var stream = System.IO.File.Create("wwwroot/" + filepath))
+                    {
+                        img.CopyTo(stream);
+                    }
+
+                     newprod.ImgBdd.Add(filepath);
                 }
-
-                newprod.imgBdd = filepath;
             }
-
 
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
@@ -145,18 +149,21 @@ namespace e_commerce.Controllers
 
 
                         
-                        int res = connexion.Execute(queryAddCatProd, new { product_id = productId, categorieID = newprod.categorieID});
+                        int res = connexion.Execute(queryAddCatProd, new { product_id = productId, categorieID = newprod.CategorieID});
                         if (res != 1)
                         {
                             throw new InvalidOperationException();
                         }
 
-                        int res2 = connexion.Execute(queryAddImg, new { product_id = productId,imgBdd = newprod.imgBdd });
-                        if (res2 != 1)
-                        {
-                            throw new InvalidOperationException();
-                        }
 
+                        foreach (var item in newprod.ImgBdd)   
+                        {
+                            int res2 = connexion.Execute(queryAddImg, new { product_id = productId, imgBdd = item });
+                            if (res2 != 1)
+                            {
+                                throw new InvalidOperationException();
+                            }
+                        }
 
                         tran.Commit();
 
@@ -176,5 +183,132 @@ namespace e_commerce.Controllers
 
             return RedirectToAction("Creation");
         }
+
+
+
+        [HttpGet]
+        public IActionResult Modification([FromRoute]int Id)
+        {
+            var uppProd = new EditionViewModel();
+            uppProd.Categories = GetCategories();
+
+            string queryProd = "select * from products where product_id = @Id";
+
+            string queryImg = "select url from image where product_id_fk = @Id";
+
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+                uppProd.Produit = connexion.QuerySingle<Produit>(queryProd,new { Id = Id });
+
+                uppProd.ImgBdd = connexion.Query<string>(queryImg, new { Id = Id }).ToList();
+            }
+
+                return View(uppProd);
+        }
+
+        [HttpPost]
+        public IActionResult Modification([FromForm] EditionViewModel uppProd)
+        {
+
+
+
+
+            if (!ModelState.IsValid)
+            {
+                return View(uppProd); // Retourne la vue avec le modèle en cas d'erreur
+            }
+
+            foreach (var img in uppProd.ImageProd)
+            {
+                if (img != null)
+                {
+                    var ext = Path.GetExtension(img.FileName).ToLowerInvariant();
+
+                    if (string.IsNullOrEmpty(ext))
+                    {
+                        ModelState.AddModelError("ImageProd", "image non accepter");
+                    }
+                }
+            }
+
+
+
+            string queryUpProd = "update products set name = @name,seller = @seller,short_desc = @short_desc,description = @description,discount =@discount,price = @price,quantity = @quantity where product_id = @Id";
+
+            string queryUpCatProd = "update products_categories set category_id_fk @categorieID where product_id_fk = @Id";
+
+            string queryAddImg = "insert into image (product_id_fk,url) values (@product_id,@imgBdd)";
+
+            foreach (var img in uppProd.ImageProd)
+            {
+                string? filepath = null;
+                if (img != null && img.Length > 0)
+                {
+                    filepath = Path.Combine("/img/imgsProds/", Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + Path.GetExtension(img.FileName)).ToString();
+
+                    using (var stream = System.IO.File.Create("wwwroot/" + filepath))
+                    {
+                        img.CopyTo(stream);
+                    }
+
+                    uppProd.ImgBdd.Add(filepath);
+                }
+            }
+
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+                connexion.Open();
+                using (var tran = connexion.BeginTransaction())
+                {
+                    try
+                    {
+                        int res = connexion.Execute(queryUpProd, new { name = uppProd.Produit.name, seller = uppProd.Produit.seller, short_desc = uppProd.Produit.short_desc, description = uppProd.Produit.description, discount = uppProd.Produit.discount, price = uppProd.Produit.price, quantity = uppProd.Produit.quantity, Id = Idprod });
+                        if (res != 1)
+                        {
+                            throw new InvalidOperationException();
+                        }
+
+
+
+                        int res2 = connexion.Execute(queryUpCatProd, new { categorieID = uppProd.CategorieID, product_id = Idprod });
+                        if (res2 != 1)
+                        {
+                            throw new InvalidOperationException();
+                        }
+
+
+                        foreach (var item in uppProd.ImgBdd)
+                        {
+                            int res3 = connexion.Execute(queryAddImg, new { product_id = Idprod, imgBdd = item });
+                            if (res3 != 1)
+                            {
+                                throw new InvalidOperationException();
+                            }
+                        }
+
+                        tran.Commit();
+
+                    }
+
+
+                    catch (Exception)
+                    {
+                        tran.Rollback();
+                        throw new InvalidOperationException("echec de la modification du produit");
+                    }
+
+                }
+
+                return RedirectToAction("Detail");
+            }
+        }
+
+        public IActionResult Suprresion(string url)
+        {
+
+
+            return RedirectToAction("Modification");
+        }
+
     }
 }

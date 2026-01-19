@@ -9,10 +9,11 @@ namespace e_commerce.ViewModels
 
         public List<SelectListItem> Categories { get; set; } = new List<SelectListItem>();
 
-        public int categorieID {  get; set; }
+        public int? CategorieID {  get; set; }
 
-        public IFormFile? ImageProd {  get; set; }
+        public List<IFormFile>? ImageProd {  get; set; }
 
-        public string? imgBdd { get; set; }
+        public List<string>? ImgBdd { get; set; } = new List<string>();
+
     }
 }

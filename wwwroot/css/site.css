@@ -143,3 +143,9 @@ header{
     order: 2;
 }
 
+/*css de la page modification*/
+
+#imgUp{
+    height:100px;
+    width:100px;
+}

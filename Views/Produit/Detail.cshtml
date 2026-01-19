@@ -59,10 +59,17 @@
      <p>@Model.quantity</p>
 
 </article>
-        @if (User.Identity.IsAuthenticated)
+        @if (User.IsInRole("User"))
         {
             <button id="ajoutPanier">
                 <a asp-area="" asp-controller="Panier" asp-action="AddProduct" asp-route-id="@(Model.product_id)">ajouter au panier</a>
+            </button>
+
+        }
+        @if (User.IsInRole("Admin"))
+        {
+            <button id="modifierprod">
+                <a asp-area="" asp-controller="Produit" asp-action="Modification" asp-route-id="@(Model.product_id)">modifier produit</a>
             </button>
 
         }
