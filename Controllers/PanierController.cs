@@ -24,22 +24,31 @@ namespace e_commerce.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Roles = "User")]
         public IActionResult Index()
         {
 
             int id_user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+
+            string queryIdCart = "select cart_id from carts where user_id_fk = @id_user";
 
             string queryProduits = "select p.* , cp.quantity  from products p join carts_products cp on p.product_id = cp.product_id_fk join carts c on cp.cart_id_fk = c.cart_id where c.user_id_fk = @id_user";
 
             //requetes sql pour recuperer tous les images de chaque produit
             string queryImages = "select * from image where product_id_fk = @product_id";
 
+            int prixTotal = 0;
+
+            int cartId;
+
             Cart cart = new Cart();
 
 
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
+
+                cartId = connexion.QuerySingle<int>(queryIdCart,new { id_user = id_user });
 
                 cart.Produits = connexion.Query<Produit, int, KeyValuePair<Produit, int>>(queryProduits, (produit, qte) =>
                 {
@@ -59,16 +68,27 @@ namespace e_commerce.Controllers
                 }
             }
 
+
+            foreach (var product in cart.Produits)
+            {
+                prixTotal += product.Key.price;
+            }
+
             PanierViewModel panierUser = new PanierViewModel();
 
+
             panierUser.cart = cart;
+            
+            panierUser.cart.CartId = cartId;
+
+            panierUser.PrixPanier = prixTotal;
 
 
 
 
             return View(panierUser);
         }
-
+        [Authorize(Roles = "User")]
         public IActionResult AddProduct(int id)
         {
             int id_user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -147,7 +167,7 @@ namespace e_commerce.Controllers
 
             return RedirectToAction("Index");
         }
-
+        [Authorize(Roles = "User")]
         public IActionResult DeletteProduct(int id)
         {
             int id_user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -208,6 +228,13 @@ namespace e_commerce.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult Paiment([FromRoute]int idCart)
+        {
+            
+            return View();
         }
 
     }

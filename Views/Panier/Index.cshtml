@@ -34,4 +34,10 @@
         </article>
     }
 
+    <div>@Model.PrixPanier</div>
+
+    <button>
+        <a asp-area="" asp-controller="Panier" asp-action="Paiment" asp-route-id="@(Model.cart.CartId)">passer au paiment</a>
+    </button>
+
 </main>

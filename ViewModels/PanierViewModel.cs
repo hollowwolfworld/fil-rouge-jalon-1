@@ -7,6 +7,7 @@ namespace e_commerce.ViewModels
 
         public Cart cart { get; set; }
 
+        public int? PrixPanier { get; set; }
 
     }
 }

@@ -111,20 +111,18 @@ header{
 .slide.active {
     opacity: 1;
     list-style: none;
-    position: relative;
    
 }
 .slide {
     list-style: none;
-    position:relative;
     opacity:0;
 }
 
 
 .imgcarou {
-    display:block;
     width: 100%;
     height: 100%;
+    position:absolute;
     object-fit:cover;
 }
 .prevnext {

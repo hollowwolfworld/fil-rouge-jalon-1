@@ -1,0 +1,21 @@
+﻿@model PanierViewModel
+
+@{
+    ViewData["Title"] = "Paiment";
+}
+
+<main>
+
+    <h1>paiment</h1>
+
+
+    <div id="cartbank">
+    <div><label asp-for="@Model"></label></div>
+    <div><input asp-for="@Model"></div>
+    <div><span asp-validation-for="@Model" class="text-danger"></span></div>
+    </div>
+
+
+
+
+</main>

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using e_commerce.Models;
 using e_commerce.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -48,7 +49,7 @@ namespace e_commerce.Controllers
             return cat;
         }
 
-
+        [Authorize]
         [HttpGet]
         //detail du produit qui prend en paramettre l'id d'un produit
         public IActionResult Detail(int id)
@@ -82,6 +83,8 @@ namespace e_commerce.Controllers
             return View(produit);
         }
 
+        [Authorize(Roles = "Admin")]
+
         [HttpGet]
         public IActionResult Creation()
         {
@@ -92,7 +95,7 @@ namespace e_commerce.Controllers
             return View(model);
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult Creation([FromForm] EditionViewModel newprod)
         {
@@ -192,7 +195,7 @@ namespace e_commerce.Controllers
         }
 
 
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Modification([FromRoute]int Id)
         {
@@ -213,6 +216,7 @@ namespace e_commerce.Controllers
                 return View(uppProd);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult Modification([FromRoute] int Id, [FromForm] EditionViewModel uppProd)
         {
@@ -317,13 +321,6 @@ namespace e_commerce.Controllers
 
                 return RedirectToAction("Creation");
             }
-        }
-
-        public IActionResult Suprresion(string url)
-        {
-
-
-            return RedirectToAction("Modification");
         }
 
     }
