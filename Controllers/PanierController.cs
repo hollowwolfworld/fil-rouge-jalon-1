@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Security.Claims;
+using System.Text;
 
 namespace e_commerce.Controllers
 {
@@ -13,6 +14,7 @@ namespace e_commerce.Controllers
 
         private readonly string _connexionString;
 
+        private const string ValidateMessageKey = "ValidateMessage";
         //creation du string de connexion a la base de donner
         public PanierController(IConfiguration configuration)
         {
@@ -231,11 +233,96 @@ namespace e_commerce.Controllers
         }
 
         [HttpGet]
-        public IActionResult Paiment([FromRoute]int idCart)
+        public IActionResult Paiment([FromRoute]int id ,[FromForm] PanierViewModel model)
         {
-            
-            return View();
+
+            int prixTotal = 0;
+
+            int id_user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            model.cart.CartId = id;
+
+            string queryProduits = "select p.* , cp.quantity  from products p join carts_products cp on p.product_id = cp.product_id_fk join carts c on cp.cart_id_fk = c.cart_id where c.user_id_fk = @id_user";
+
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+
+
+                model.cart.Produits = connexion.Query<Produit, int, KeyValuePair<Produit, int>>(queryProduits, (produit, qte) =>
+                {
+                    return new KeyValuePair<Produit, int>(produit, qte);
+                }, new { id_user = id_user }, splitOn: "quantity").ToDictionary<Produit, int>();
+            }
+
+
+                foreach (var product in model.cart.Produits)
+            {
+                prixTotal += product.Key.price;
+            }
+        model.PrixPanier = prixTotal;
+
+            return View(model);
         }
 
+
+        [HttpPost]
+
+        public IActionResult Paiment([FromForm] PanierViewModel model)
+        {
+            if (!VerifCarteBc(model.NumeroCarteBc))
+            {
+                TempData[ValidateMessageKey] = "carte non valide";
+                return View(model);
+            }
+
+            int id_user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+
+
+
+            return View(model); 
+        }
+
+
+        public bool VerifCarteBc (string numeroCarteBc)
+        {
+            var sb = new StringBuilder(numeroCarteBc);
+            for(int i = sb.Length - 2 ; i >= 0;i = i-2 )
+            {
+                string num = sb[i].ToString();
+                if (int.Parse(num) * 2 > 9)
+                {
+                    int value = 0;
+                    string stockCalc = (int.Parse(num) * 2).ToString();
+
+                    for (int i2 = 0; i2 < stockCalc.Length;i2++)
+                    {
+                    string num2 = stockCalc[i2].ToString();
+                        value += int.Parse(num2);
+                    }
+
+                    sb[i] = value.ToString()[0];
+                }
+               
+            }
+
+            int chiffreAdditionner = 0;
+
+            for (int i = 0; i < sb.Length; i++)
+            {
+
+                string resTemp = sb[i].ToString();
+                chiffreAdditionner += int.Parse(resTemp);
+            }
+
+            if (chiffreAdditionner % 10 == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

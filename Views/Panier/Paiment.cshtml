@@ -4,18 +4,36 @@
     ViewData["Title"] = "Paiment";
 }
 
+@if (ViewData.ContainsKey("ValidateMessage"))
+{
+    <p>@ViewData["ValidateMessage"]</p>
+}
+@if (TempData.ContainsKey("ValidateMessage"))
+{
+    <p>@TempData["ValidateMessage"]</p>
+}
+
 <main>
 
     <h1>paiment</h1>
 
+    <p>voici votre total payer: @Model.PrixPanier</p>
 
-    <div id="cartbank">
-    <div><label asp-for="@Model"></label></div>
-    <div><input asp-for="@Model"></div>
-    <div><span asp-validation-for="@Model" class="text-danger"></span></div>
-    </div>
+    <form asp-action="Paiment" asp-controller="Panier" method="post">
 
+        <div class="form-group">
+            <label asp-for="@Model.NumeroCarteBc"></label>
+            <input asp-for="@Model.NumeroCarteBc" class="form-control" />
+            <span asp-validation-for="@Model.NumeroCarteBc" class="text-danger"></span>
+        </div>
 
-
-
+        <button type="submit" class="btn btn-primary">payer</button>
+    
+    </form>
 </main>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

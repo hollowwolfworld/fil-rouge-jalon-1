@@ -28,5 +28,7 @@ namespace e_commerce.Models
         public List<Image> ?imagesProduits { get; set; }
 
         public List<Categorie> ?categoriesProd { get; set; }
+
+        public string? Datedelivraison { get; set; }
     }
 }

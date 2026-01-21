@@ -1,0 +1,24 @@
+﻿@model Dictionary<Produit, int>
+
+@{
+    ViewData["Title"] = "commandes";
+}
+
+<main>
+
+
+    <div>
+        @foreach (var item in Model)
+        {
+            <div>@item.Key.name</div>
+            <div>@item.Value</div>
+        }
+
+
+    </div>
+
+
+
+
+
+</main>

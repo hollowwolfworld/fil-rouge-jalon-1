@@ -32,3 +32,4 @@ app.MapControllerRoute(
     pattern: "{controller=acceuil}/{action=Index}/{id?}");
 
 app.Run();
+
