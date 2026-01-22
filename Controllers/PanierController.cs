@@ -275,12 +275,92 @@ namespace e_commerce.Controllers
                 return View(model);
             }
 
+
+
+            Order commandeEnCourt = new Order();
+
             int id_user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
+            string queryProduits = "select p.* , cp.quantity  from products p join carts_products cp on p.product_id = cp.product_id_fk join carts c on cp.cart_id_fk = c.cart_id where c.user_id_fk = @id_user";
+
+
+            string queryCart = "select cart_id from carts where user_id_fk = @user_id";
+
+            string queryDelCartProd = "delete from carts_products where cart_id_fk = @cartId";
+
+            string queryDelCart = "delete from carts where user_id_fk = @user_id";
+
+            string queryOrder = "insert into orders (order_status_id_fk,user_id_fk) values (@value,@id_user) returning order_id";
+
+            string queryOrder_Products = "insert into orders_products (order_id_fk,product_id_fk,quantity) values (@id_order,@idProduct,@quantity)";
+
+            string queryUpProd = "update products p set quantity = p.quantity - @quantity, sells_score = sells_score + 1 where product_id = @id";
+
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+
+
+                model.cart.Produits = connexion.Query<Produit, int, KeyValuePair<Produit, int>>(queryProduits, (produit, qte) =>
+                {
+                    return new KeyValuePair<Produit, int>(produit, qte);
+                }, new { id_user = id_user }, splitOn: "quantity").ToDictionary<Produit, int>();
+
+
+                connexion.Open();
+                using (var tran = connexion.BeginTransaction())
+                {
+                    try
+                    {
+                        int id_order = connexion.ExecuteScalar<int>(queryOrder, new { value = 2, id_user = id_user });
+
+
+                        foreach (var item in model.cart.Produits)
+                        {
+                            int res = connexion.Execute(queryOrder_Products, new { id_order = id_order, idProduct = item.Key.product_id, quantity = item.Value });
+                            if (res != 1)
+                            {
+                                throw new InvalidOperationException();
+                            }
+
+                            if (item.Value > item.Key.quantity)
+                            {
+                                throw new InvalidOperationException("pas assez de ce produit en stock");
+                            }
+                            else
+                            {
+                                int res2 = connexion.Execute(queryUpProd, new { quantity = item.Value, id = item.Key.product_id });
+                                if (res2 != 1)
+                                {
+                                    throw new InvalidOperationException();
+                                }
+                            }
+
+                        }
+
+                        int cartId = connexion.QuerySingle<int>(queryCart, new { user_id = id_user });
+
+                        int res3 = connexion.Execute(queryDelCartProd, new { cartId = cartId });
+
+                        int res4 = connexion.Execute(queryDelCart, new { user_id = id_user });
+
+                        if (res4 != 1)
+                        {
+                            throw new InvalidOperationException();
+                        }
+
+                        tran.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        tran.Rollback();
+                        throw new InvalidOperationException("echec du paiment");
+                    }
+                }
 
 
 
-            return View(model); 
+                return RedirectToAction("Index" ,"Commande");
+            }
         }
 
 
