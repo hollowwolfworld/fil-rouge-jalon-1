@@ -1,0 +1,24 @@
+﻿@model List<User>
+
+@{
+    ViewData["Title"] = "page gestion utilisateur";
+}
+
+
+<h1>utilisateurs</h1>
+
+@foreach (var item in Model)
+{
+    <div> 
+    <p>@item.Firstname</p>
+    <p>@item.Name</p>
+      @if (item.Admin == true)
+        {
+           <p>administrateur</p> 
+        }
+    @if (item.Admin == false)
+    {
+        <p>utilisateur</p>
+    }
+    </div>
+}

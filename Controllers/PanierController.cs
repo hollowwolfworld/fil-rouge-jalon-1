@@ -50,7 +50,7 @@ namespace e_commerce.Controllers
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
 
-                cartId = connexion.QuerySingle<int>(queryIdCart,new { id_user = id_user });
+                cartId = connexion.QuerySingle<int>(queryIdCart, new { id_user = id_user });
 
                 cart.Produits = connexion.Query<Produit, int, KeyValuePair<Produit, int>>(queryProduits, (produit, qte) =>
                 {
@@ -80,7 +80,7 @@ namespace e_commerce.Controllers
 
 
             panierUser.cart = cart;
-            
+
             panierUser.cart.CartId = cartId;
 
             panierUser.PrixPanier = prixTotal;
@@ -233,9 +233,9 @@ namespace e_commerce.Controllers
         }
 
         [HttpGet]
-        public IActionResult Paiment([FromRoute]int id ,[FromForm] PanierViewModel model)
+        public IActionResult Paiment([FromRoute] int id)
         {
-
+            PanierViewModel model = new PanierViewModel();
             int prixTotal = 0;
 
             int id_user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -255,11 +255,11 @@ namespace e_commerce.Controllers
             }
 
 
-                foreach (var product in model.cart.Produits)
+            foreach (var product in model.cart.Produits)
             {
                 prixTotal += product.Key.price;
             }
-        model.PrixPanier = prixTotal;
+            model.PrixPanier = prixTotal;
 
             return View(model);
         }
@@ -287,8 +287,6 @@ namespace e_commerce.Controllers
             string queryCart = "select cart_id from carts where user_id_fk = @user_id";
 
             string queryDelCartProd = "delete from carts_products where cart_id_fk = @cartId";
-
-            string queryDelCart = "delete from carts where user_id_fk = @user_id";
 
             string queryOrder = "insert into orders (order_status_id_fk,user_id_fk) values (@value,@id_user) returning order_id";
 
@@ -341,12 +339,6 @@ namespace e_commerce.Controllers
 
                         int res3 = connexion.Execute(queryDelCartProd, new { cartId = cartId });
 
-                        int res4 = connexion.Execute(queryDelCart, new { user_id = id_user });
-
-                        if (res4 != 1)
-                        {
-                            throw new InvalidOperationException();
-                        }
 
                         tran.Commit();
                     }
@@ -359,15 +351,15 @@ namespace e_commerce.Controllers
 
 
 
-                return RedirectToAction("Index" ,"Commande");
+                return RedirectToAction("Index", "Commande");
             }
         }
 
 
-        public bool VerifCarteBc (string numeroCarteBc)
+        public bool VerifCarteBc(string numeroCarteBc)
         {
             var sb = new StringBuilder(numeroCarteBc);
-            for(int i = sb.Length - 2 ; i >= 0;i = i-2 )
+            for (int i = sb.Length - 2; i >= 0; i = i - 2)
             {
                 string num = sb[i].ToString();
                 if (int.Parse(num) * 2 > 9)
@@ -375,15 +367,15 @@ namespace e_commerce.Controllers
                     int value = 0;
                     string stockCalc = (int.Parse(num) * 2).ToString();
 
-                    for (int i2 = 0; i2 < stockCalc.Length;i2++)
+                    for (int i2 = 0; i2 < stockCalc.Length; i2++)
                     {
-                    string num2 = stockCalc[i2].ToString();
+                        string num2 = stockCalc[i2].ToString();
                         value += int.Parse(num2);
                     }
 
                     sb[i] = value.ToString()[0];
                 }
-               
+
             }
 
             int chiffreAdditionner = 0;
