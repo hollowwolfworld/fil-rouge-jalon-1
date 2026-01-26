@@ -39,6 +39,7 @@ namespace e_commerce.Controllers
 
             string queryCategories = "select * from categories c join products_categories pc on pc.category_id_fk = c.category_id where pc.product_id_fk = @product_id ";
 
+
             //creation de lists pour stoquer les resultat des query
             List<Produit> produits;
 

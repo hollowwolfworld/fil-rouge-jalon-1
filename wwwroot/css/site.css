@@ -15,6 +15,10 @@ header{
     margin: 20px;
 }
 
+.navbar {
+    grid-column-start: 3;
+}
+
 #elemUser {
     grid-column-start: 4;
 }

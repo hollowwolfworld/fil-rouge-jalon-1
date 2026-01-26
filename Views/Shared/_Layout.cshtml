@@ -27,6 +27,12 @@
             <p>@User.Identity.Name</p>
         </div>
         }
+
+        <nav class="navbar">
+            <div>
+                @await Component.InvokeAsync("Navbar")
+            </div>
+        </nav>
            
         <div id="icons"></div>
     </header>

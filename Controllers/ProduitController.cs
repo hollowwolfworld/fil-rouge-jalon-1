@@ -323,5 +323,59 @@ namespace e_commerce.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult Recherche(string? termeRecherche, int? categorieId)
+        {
+            List<Produit> produits = new List<Produit>();
+
+            string queryImages = "select * from image where product_id_fk = @product_id";
+
+            string queryCategories = "select * from categories c join products_categories pc on pc.category_id_fk = c.category_id where pc.product_id_fk = @product_id ";
+
+            string query = "SELECT * FROM products p join products_categories pc on p.product_id = pc.product_id_fk WHERE 1=1 ";
+
+            List<Image> images;
+
+            List<Categorie> categories;
+
+            // Ajouter des filtres selon les paramètres
+            if (!string.IsNullOrEmpty(termeRecherche))
+            {
+                query += $" AND name LIKE '%{termeRecherche}%'";
+            }
+
+            if (categorieId.HasValue)
+            {
+                query += $" AND category_id_fk = {categorieId}";
+            }
+
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+                produits = connexion.Query<Produit>(query).ToList();
+            }
+
+            foreach (var produit in produits)
+            {
+                using (var connexion = new NpgsqlConnection(_connexionString))
+                {
+                    images = connexion.Query<Image>(queryImages, produit).ToList();
+                }
+
+                produit.imagesProduits = images;
+            }
+
+            foreach (var produit in produits)
+            {
+                using (var connexion = new NpgsqlConnection(_connexionString))
+                {
+                    categories = connexion.Query<Categorie>(queryCategories, produit).ToList();
+                }
+
+                produit.categoriesProd = categories;
+            }
+
+            return View("Views/Acceuil/Index.cshtml", produits);
+        }
+
     }
 }

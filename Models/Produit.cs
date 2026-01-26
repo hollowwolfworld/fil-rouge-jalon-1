@@ -25,9 +25,9 @@ namespace e_commerce.Models
 
         public DateTime created_at { get; set; }
 
-        public List<Image> ?imagesProduits { get; set; }
+        public List<Image> ?imagesProduits { get; set; } = new List<Image>();
 
-        public List<Categorie> ?categoriesProd { get; set; }
+        public List<Categorie>? categoriesProd { get; set; } = new List<Categorie>();
 
         public string? Datedelivraison { get; set; }
     }

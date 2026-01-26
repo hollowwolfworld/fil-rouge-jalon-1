@@ -1,0 +1,14 @@
+﻿@model NavbarViewModel
+
+<form asp-controller="Produit" asp-action="Recherche" method="get">
+    <!-- Liste déroulante pour les catégories -->
+    <select asp-for="@Model.CategorieId" asp-items="@Model.Categories">
+        <option value="">-- Toutes les catégories --</option>
+    </select>
+
+    <!-- Champ de texte pour le terme de recherche -->
+    <input asp-for="@Model.TermeRecherche" placeholder="Rechercher des produit" />
+
+    <!-- Bouton de soumission -->
+    <button type="submit">Chercher</button>
+</form>
