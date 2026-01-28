@@ -11,6 +11,8 @@
 <body>
     <header id="header">
         <img id="logo" src="/img/logo.png"/>
+
+        <partial name="_CookieConsentPartial" />
        
         @if(User.Identity.IsAuthenticated)
         {

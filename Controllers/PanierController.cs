@@ -4,11 +4,13 @@ using e_commerce.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using System.ComponentModel.Design;
 using System.Security.Claims;
 using System.Text;
 
 namespace e_commerce.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class PanierController : Controller
     {
 
@@ -275,7 +277,8 @@ namespace e_commerce.Controllers
                 return View(model);
             }
 
-
+            int postcode = 0;
+            
 
             Order commandeEnCourt = new Order();
 
@@ -293,6 +296,8 @@ namespace e_commerce.Controllers
             string queryOrder_Products = "insert into orders_products (order_id_fk,product_id_fk,quantity) values (@id_order,@idProduct,@quantity)";
 
             string queryUpProd = "update products p set quantity = p.quantity - @quantity, sells_score = sells_score + 1 where product_id = @id";
+
+            
 
             using (var connexion = new NpgsqlConnection(_connexionString))
             {
@@ -349,10 +354,11 @@ namespace e_commerce.Controllers
                     }
                 }
 
-
-
-                return RedirectToAction("Index", "Commande");
             }
+            
+
+
+            return RedirectToAction("Index", "Commande");
         }
 
 
@@ -397,4 +403,5 @@ namespace e_commerce.Controllers
             }
         }
     }
+         
 }

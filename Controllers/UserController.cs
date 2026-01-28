@@ -6,6 +6,7 @@ using Dapper;
 
 namespace e_commerce.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class UserController : Controller
     {
 

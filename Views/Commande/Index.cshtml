@@ -17,8 +17,14 @@
 
     </div>
 
-
-
+    <div id="jour">coucou</div>
 
 
 </main>
+<script src="~/js/site.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        DateLivraison("@ViewData["zipCode"]");
+    });
+</script>

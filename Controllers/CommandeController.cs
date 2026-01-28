@@ -8,9 +8,10 @@ using Dapper;
 
 namespace e_commerce.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class CommandeController : Controller
     {
-
+        
         private readonly string _connexionString;
 
         public CommandeController(IConfiguration configuration)
@@ -24,13 +25,14 @@ namespace e_commerce.Controllers
         }
         public IActionResult Index()
         {
-
+            
             int id_user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             Dictionary<Produit, int> Produits = new Dictionary<Produit, int>();
 
         string queryProduits = "select p.*,op.quantity from products p join orders_products op on p.product_id = op.product_id_fk join orders o on o.order_id = op.order_id_fk where o.user_id_fk = @id_user";
 
+            string queryCodePost = "select a.postcode FROM users u join addresses a on u.addresse_id_fk = a.addresse_id where u.user_id = @user_id";
 
             using (var connexion = new NpgsqlConnection(_connexionString))
             { 
@@ -40,7 +42,13 @@ namespace e_commerce.Controllers
                 }, new { id_user = id_user }, splitOn: "quantity").ToDictionary<Produit, int>();
 
             }
-                return View(Produits);
+            using (var connexion = new NpgsqlConnection(_connexionString))
+            {
+                int postcode = connexion.ExecuteScalar<int>(queryCodePost, new { user_id = id_user });
+                ViewData["zipCode"] = postcode;
+            }
+
+            return View(Produits);
         }
     }
 }

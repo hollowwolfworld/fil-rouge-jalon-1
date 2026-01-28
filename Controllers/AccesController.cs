@@ -20,6 +20,7 @@ using System.Text;
 
 namespace e_commerce.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class AccesController : Controller
     {// attribut stockant la chaîne de connexion à la base de données
         private readonly string _connexionString;

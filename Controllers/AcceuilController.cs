@@ -8,9 +8,10 @@ using System.Text.Json;
 
 namespace e_commerce.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class AcceuilController : Controller
     {
- 
+      
         private readonly string _connexionString;
 
       //creation du string de connexion a la base de donner

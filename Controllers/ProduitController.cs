@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace e_commerce.Controllers
 {
-
+    [AutoValidateAntiforgeryToken]
 
     public class ProduitController : Controller
     {
