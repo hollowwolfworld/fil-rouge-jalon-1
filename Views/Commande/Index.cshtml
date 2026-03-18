@@ -10,14 +10,14 @@
     <div>
         @foreach (var item in Model)
         {
+            <div id="commande">
             <div>@item.Key.name</div>
-            <div>@item.Value</div>
+            <div> quantité commandée:   @item.Value</div>
+            </div>
         }
 
 
     </div>
-
-    <div id="jour">coucou</div>
 
 
 </main>

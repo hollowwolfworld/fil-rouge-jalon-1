@@ -8,6 +8,7 @@
 
 <h1>fiche produit</h1>
 
+<div id="cadre">
 
 <div class="carouselle">
     <ul class="clc">
@@ -31,6 +32,8 @@
     <button class="btnCarouselle" id="prev">&#10096</button>
     <button class="btnCarouselle" id="next">&#10097</button>
     </div>
+
+        </div>
 </div>
 
     <nav id="elem_FicheProd">
@@ -44,19 +47,19 @@
 
         <article id="sellerFicheProd">
 
-    <p>@Model.seller</p>
+    <p>vendeur: @Model.seller</p>
 
 </article>
 
         <article id="priceFicheProd">
 
-    <p>@Model.price</p>
+    <p>prix: @Model.price</p>
 
 </article>
 
         <article id="quantityFicheProd">
 
-     <p>@Model.quantity</p>
+     <p>il reste en stock @Model.quantity unité de ce produit</p>
 
 </article>
         @if (User.IsInRole("User"))

@@ -7,6 +7,8 @@
 
 <main>
 
+
+<div id="centrer">
 <h1>panier</h1>
 
 
@@ -25,19 +27,19 @@
             }
 
 
-            <p>@item.Key.price</p>
+            <p>prix: @item.Key.price</p>
             <p>@item.Key.short_desc</p>
-            <p>@item.Value</p>
+            <p>nombre de ce produit commander: @item.Value</p>
             <button>
                 <a asp-area="" asp-controller="Panier" asp-action="DeletteProduct" asp-route-id="@(item.Key.product_id)">retirer du panier</a>
             </button>
         </article>
     }
 
-    <div>@Model.PrixPanier</div>
+    <div>prix total: @Model.PrixPanier</div>
 
     <button>
         <a asp-area="" asp-controller="Panier" asp-action="Paiment" asp-route-id="@(Model.cart.CartId)">passer au paiment</a>
     </button>
-
+    </div>
 </main>

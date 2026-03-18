@@ -4,6 +4,7 @@
     ViewData["Title"] = "page de modification";
 }
 
+<div id="centrer">
 <h1>modification</h1>
 
 <form asp-controller="Produit" asp-action="Modification" method="post" enctype="multipart/form-data">
@@ -68,7 +69,7 @@
 
     <input type="submit" value="Envoyer">
 </form>
-
+</div>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

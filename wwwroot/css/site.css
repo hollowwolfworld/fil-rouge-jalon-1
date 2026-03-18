@@ -1,11 +1,19 @@
 
 
 /*css du header*/
+body{
+    margin : 0;
+}
 
-header{
-    border-bottom:solid;
-    display:grid;
-    grid-template-columns:20% 20% 20% 20% 20%;
+.container {
+    margin: 0;
+}
+
+header {
+    border-bottom: solid;
+    display: grid;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    background-color: rgb(224, 127, 47);
 }
 
 #logo {
@@ -13,6 +21,7 @@ header{
     width: 100px;
     height: 100px;
     margin: 20px;
+    border-radius:50px;
 }
 
 .navbar {
@@ -21,17 +30,32 @@ header{
 
 #elemUser {
     grid-column-start: 4;
+    grid-row: 1;
+    justify-self: center;
 }
+
+/*main*/
+
+#body {
+    background-color:lightgrey;
+}
+
 /*css du menu burger*/
-#burger {
+#icons {
     list-style: none;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size: 50px;
+
 }
 
 #elem_burger {
-   flex-direction:column;
-   background-color:antiquewhite;
-   text-align: center;
-   
+    list-style: none;
+    flex-direction: column;
+    background-color: antiquewhite;
+    text-align: center;
+    margin : 0;
 }
 
 
@@ -49,19 +73,29 @@ header{
     grid-column-start:5;
 }
 
+
 #menu{
     display: none;
+    margin : 0;
 }
 
-#menu.active{
-    display : block;
-}
+    #menu.active {
+        display: block;
+        list-style : none;
+    }
 
 .nav-item {
     list-style: none;
+    margin: 0;
 }
 
 /*css de la page d'acceuil*/
+
+#titreacceuil {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
 
 #acceuil {
     display: flex;
@@ -73,8 +107,9 @@ header{
 /*css des card*/
 
 #imgCard {
-    width: 50%;
-    height: 50%;
+
+    width: 15vw;
+    aspect-ratio:1/1;
 }
 
 .Card {
@@ -82,7 +117,8 @@ header{
     flex-direction: column;
     justify-content: center;
     align-items:center;
-    width: 50%;
+    width: 33%;
+    height:33%;
     border-style:solid;
 }
 
@@ -92,16 +128,24 @@ header{
 .fiche_prod {
     display: flex;
     flex-direction: column;
-    align-content: flex-start;
-    width: 100vw;
+    align-items:center;
+    width: 100%;
     height: 100vh;
+    margin-top:0;
 }
 
 /*css du carrouselle*/
+
+#cadre {
+    display:block;
+    height: 50%;
+    width: 450px;
+
+}
+
 .carouselle {
     order: 1;
-    display: block;
-    height: 50%;
+    height: 100%;
     width: 100%;
     position: relative;
     overflow: hidden;
@@ -109,13 +153,12 @@ header{
 
 .clc {
     list-style: none;
-    height: 100%;
     overflow: hidden;
 }
 .slide.active {
+
     opacity: 1;
     list-style: none;
-   
 }
 .slide {
     list-style: none;
@@ -124,10 +167,11 @@ header{
 
 
 .imgcarou {
-    width: 100%;
-    height: 100%;
-    position:absolute;
-    object-fit:cover;
+    height:400px;
+/*    width:100%;*/
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    position:absolute
 }
 .prevnext {
     position: absolute;
@@ -136,7 +180,7 @@ header{
     transform: translate(-50%, -50%);
     display: flex;
     justify-content: space-between;
-    width: 90%;
+    width: 100%;
 }
 
 /*css de la nav fiche prod*/
@@ -150,4 +194,34 @@ header{
 #imgUp{
     height:100px;
     width:100px;
+}
+
+.navbar{
+    align-content:center;
+}
+
+#centrer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.Card_panier {
+    border: double;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    flex-wrap: wrap;
+}
+
+/*css de la page commande*/
+
+#commande {
+    display: flex;
+    border:groove;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
 }
